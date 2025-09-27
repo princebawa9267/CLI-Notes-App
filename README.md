@@ -1,3 +1,4 @@
 ﻿# CLI-Notes-App
 
-## Wait working on it, not completed yet
+## Please wait I am working on it, not completed yet.
+
