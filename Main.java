@@ -44,6 +44,10 @@ public class Main{
                 case 6 -> NotesManager.showCurrentPath();
                 case 7 -> NotesManager.showAllFilesAndFolders();
                 case 8 -> NotesManager.createFile(sc);
+                case 9 -> NotesManager.readFile(sc);
+                case 10 -> NotesManager.updateFile(sc);
+                case 11 -> NotesManager.removeFile(sc);
+                case 12 -> NotesManager.renameFile(sc);
                 case 13 -> {
                     break mainLoop;
                 }

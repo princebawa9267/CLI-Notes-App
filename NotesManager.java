@@ -1,5 +1,7 @@
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,7 +27,7 @@ public class NotesManager {
         System.out.print("Enter folder name : ");
         String folderName = sc.nextLine();
 
-        File folder = new File(path +"/"+ folderName);
+        File folder = new File(path + "/" + folderName);
 
         // mkdirs is used because there we can create nested folders
         if (folder.mkdirs()) {
@@ -63,7 +65,7 @@ public class NotesManager {
     public static void renameFolder(Scanner sc) {
         System.out.print("Enter folder name : ");
         String oldFolderName = sc.nextLine();
-        File oldFolder = new File(path +"/"+ oldFolderName);
+        File oldFolder = new File(path + "/" + oldFolderName);
         if (!oldFolder.exists()) {
             System.out.println("Wrong Folder path!!!");
             return;
@@ -71,10 +73,9 @@ public class NotesManager {
         System.out.print("Enter new folder name");
         String newFolderName = sc.nextLine();
         File newFolder = new File(path + "/" + newFolderName);
-        if(newFolder.exists()){
+        if (newFolder.exists()) {
             System.out.println("This named file already exists..");
-        }
-        else{
+        } else {
             oldFolder.renameTo(newFolder);
             System.out.println("Renamed successfully");
         }
@@ -85,25 +86,22 @@ public class NotesManager {
         System.out.print("Enter folder name : ");
         String folderName = sc.nextLine();
         File folder = new File(path + "/" + folderName);
-        if(folder.exists() && folder.isDirectory()){
-            if(folder.delete()){
+        if (folder.exists() && folder.isDirectory()) {
+            if (folder.delete()) {
                 System.out.println(folderName + " is deleted.");
-            }
-            else{
-                try{
-                    for(File file : folder.listFiles()){
+            } else {
+                try {
+                    for (File file : folder.listFiles()) {
                         file.delete();
                     }
                     folder.delete();
                     System.out.println(folderName + " is deleted successfully");
-                }
-                catch(Exception e){
+                } catch (Exception e) {
                     System.out.println("Make sure this folder's subfolder are empty");
                 }
-                
+
             }
-        }
-        else{
+        } else {
             System.out.println("Folder not exists");
         }
     }
@@ -124,38 +122,105 @@ public class NotesManager {
     }
 
     // 8
-    public static void createFile(Scanner sc){
+    public static void createFile(Scanner sc) {
         try {
             System.out.print("Enter file name with format (like :- myText.txt) : ");
             String fileName = sc.nextLine();
             File file = new File(path + "/" + fileName);
             if (file.createNewFile()) {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(file,true));
-                System.out.println("Start typing your notes (type 'exit' to stop):");
-                while(true){
-                    String line = sc.nextLine();
-                    if(line.equalsIgnoreCase("exit")){
-                        break;
-                    }
-                    bw.write(line);
-                    bw.newLine();
-                }
-                bw.close();
-                System.out.println("File created: " + file.getAbsolutePath());
+                addText(file, sc, true);
+                System.out.println("File created : " + file.getAbsolutePath());
             } else {
-                System.out.println("File already exists: " + file.getAbsolutePath());
+                System.out.println("File already exists : " + file.getAbsolutePath());
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void addText(){
-        System.out.println("Do you want to append or rewrite");
+    private static void addText(File file, Scanner sc, boolean mode) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, mode))) {
+            System.out.println("Start typing your notes (type 'exit' to stop):");
+            while (true) {
+                String line = sc.nextLine();
+                if (line.equalsIgnoreCase("exit")) {
+                    break;
+                }
+                bw.write(line);
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static File takeAndCheckFileExits(Scanner sc) {
+        System.out.print("Enter the file name : ");
+        String fileName = sc.nextLine();
+        File file = new File(path + "/" + fileName);
+        if (!file.exists() || file.isDirectory()) {
+            System.out.println("File not exits");
+            return null;
+        } else {
+            return file;
+        }
     }
 
     // 9
-    public static void readFile(Scanner sc){
-        
+    public static void readFile(Scanner sc) {
+        File file = takeAndCheckFileExits(sc);
+        if (file == null)
+            return;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Error in creating your file");
+        }
+    }
+
+    // 10
+    public static void updateFile(Scanner sc) {
+        File file = takeAndCheckFileExits(sc);
+        if (file == null)
+            return;
+        System.out.println();
+        System.out.println("1. Want to append ?");
+        System.out.println("2. Want to rewrite ?");
+        System.out.println("Enter choice(1-2) : ");
+        byte choice = sc.nextByte();
+
+        switch (choice) {
+            case 1 -> addText(file, sc, true);
+            case 2 -> addText(file, sc, false);
+            default -> System.out.println("You entered the wrong input");
+        }
+    }
+
+    public static void removeFile(Scanner sc) {
+        File file = takeAndCheckFileExits(sc);
+        if (file == null)
+            return;
+        if (file.delete()) {
+            System.out.println("File deleted successfully : " + file.getAbsolutePath());
+        } else {
+            System.out.println("Failed to delete file");
+        }
+    }
+
+    public static void renameFile(Scanner sc) {
+        File file = takeAndCheckFileExits(sc);
+        if (file == null) return;
+        System.out.print("Enter new file name : ");
+        String newFileName = sc.nextLine();
+        File newFile = new File(path + "/" + newFileName);
+        if (file.renameTo(newFile)) {
+            System.out.println("File renamed to: " + newFile.getAbsolutePath());
+        } else {
+            System.out.println("Failed to rename file.");
+        }
     }
 }
