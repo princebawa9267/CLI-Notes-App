@@ -329,4 +329,13 @@ Java Notes is deleted successfully
 PS D:\Personal space\Elevate labs Internship\Day4> 
 ```
 
+---
+
+## 💬 Acknowledgements
+This project was developed independently. However, AI tools were utilized for assistance in specific areas:
+
+- **Google Gemini**  
+  - Helped structure, write, and format this `README.md` file.
+- **General AI Assistance**  
+  - Consulted for troubleshooting and debugging during development.
 
